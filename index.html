@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        max-height: 100vh;
+    }
+    svg {
+        display: inline-block;
+        max-height: 20vh;
+        float: left;
+    }
+    </style>
+        <h1>Hello, world</h1>
+        <p>Now {{.Now}}</p>
+        <p>Platform {{.Platform}}</p>
+        <p>Family {{.PlatformFamily}}</p>
+        <p>Version {{.PlatformVersion}}</p>
+        <svg viewBox="0 0 300 100">
+            <rect
+                style="fill:red;"
+                x="0%"
+                y="0%"
+                height="100%"
+                width="100%"
+            />
+            <text x="50%" y="50%" text-anchor="middle" font-size="1rem" align-baseline="central">{{printf "%.2f" .CPUUsage}} ({{.CPUPhysicalCoreNumber}}/{{.CPULogicalCoreNumber}})</text>
+        </svg>
+        <svg viewBox="0 0 100 100">
+            <rect
+                style="fill:blue;"
+                x="0%"
+                y="0%"
+                height="100%"
+                width="100%"
+            />
+            <text x="50%" y="50%" font-size="1rem" text-anchor="middle" align-baseline="central">{{ with index .Temperatures 0}} {{.Temperature}} {{ end }}</text>
+        </svg>
+    </body>
+    <script>
+        setTimeout(() => history.go(0), 1000)
+    </script>
+</html>
