@@ -1,0 +1,35 @@
+# vim:ft=ini
+
+; timeout passed to the tail script
+reload_timeout=1000
+
+[distroicon]
+; Image url used in the background
+background_image=https://raw.githubusercontent.com/NixOS/nixos-artwork/master/logo/nix-snowflake.svg
+; How many space cells on width
+size_x=2
+; How many space cells on height
+size_y=2
+
+[cpu]
+background_color=red
+size_x=2
+size_y=1
+label={{printf "%.2f" .CPUUsage}}% ({{.CPUPhysicalCoreNumber}}/{{.CPULogicalCoreNumber}})
+
+[disk]
+background_color=green
+size_x=2
+size_y=1
+label={{with .DiskUsage "/"}}{{printf "%.2f" .UsedPercent}}{{end}}%
+
+[temp]
+background_color=blue
+; size_x and size_y defaults to 1
+label={{ with index .Temperatures 0}} {{.Temperature}} °C{{ end }}
+
+[load]
+background_color=yellow
+size_x=3
+size_y=1
+label=L: {{ with .AvgLoad }} {{printf "%.2f/%.2f/%.2f" .Load1 .Load5 .Load15}} {{ end }}

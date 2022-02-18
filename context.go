@@ -15,10 +15,14 @@ import (
 
 type RequestContext struct {
     context context.Context
+    sizeBaseline int
 }
 
 func NewRequestContext(ctx context.Context) *RequestContext {
-    return &RequestContext{ctx}
+    return &RequestContext{
+        context: ctx,
+        sizeBaseline: 100,
+    }
 }
 
 func (r *RequestContext) Hostname() (string, error) {
