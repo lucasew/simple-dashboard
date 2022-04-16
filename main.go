@@ -15,9 +15,9 @@ var config gocfg.Config
 const htmlBefore = `
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0">
     </head>
-    <body>
+    <body id="top">
     <style>
     body {
         margin: 0;
@@ -50,7 +50,13 @@ const htmlBefore = `
     </style>
 `
 const htmlAfter = `
-    <script>setTimeout(() => window.location.reload(), 1000)</script>
+    <script>setTimeout(() => {
+        document.body.style.zoom = "100%";
+        if (!window.location.href.endsWith("#top")) {
+            window.location.href = "#top"
+        }
+        window.location.reload()
+    }, 1000)</script>
     </body>
 </html>
 `
