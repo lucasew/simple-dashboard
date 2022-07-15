@@ -1,16 +1,14 @@
-package main
+package godashboard
 
 import (
-	"flag"
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 
 	"github.com/lucasew/gocfg"
 )
 
 var PORT int
-var config gocfg.Config
 
 const htmlBefore = `
 <html>
@@ -61,24 +59,14 @@ const htmlAfter = `
 </html>
 `
 
-var blocks []RenderableBlock
 
-func init() {
-    // flag.StringVar(&TEMPLATE_FILE, "t", "index.html", "template file to use for dashboard")
-    var configFile string
-    flag.StringVar(&configFile, "c", "config.cfg", "Config file with the blocks defined")
-    flag.IntVar(&PORT, "p", 8080, "Port to listen for connections")
-    flag.Parse()
-    f, err := os.Open(configFile)
-    if err != nil {
-        panic(err)
-    }
-    config = gocfg.NewConfig()
-    err = config.InjestReader(f)
-    if err != nil {
-        panic(err)
-    }
-    for k, v := range config {
+type GoDashboard struct {
+    blocks []RenderableBlock
+}
+
+func NewGoDashboard(cfg gocfg.Config) http.Handler {
+    blocks := []RenderableBlock{}
+    for k, v := range cfg {
         if k == "" {
             continue
         }
@@ -87,32 +75,32 @@ func init() {
             panic(fmt.Errorf("while loading section '%s': %w", k, err))
         }
         blocks = append(blocks, block)
-        fmt.Printf("setting up section %s\n", k)
+        log.Printf("setting up section %s\n", k)
     }
+    return NewGoDashboardFromBlocks(blocks...)
 }
 
-func main() {
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        var err error
-        reqContext := NewRequestContext(r.Context())
+func NewGoDashboardFromBlocks(blocks ...RenderableBlock) http.Handler {
+    return &GoDashboard{blocks}
+}
 
-        _, err = fmt.Fprint(w, htmlBefore)
+func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    log.Printf("got connection from %s", r.RemoteAddr)
+    var err error
+    reqContext := NewRequestContext(r.Context())
+
+    _, err = fmt.Fprint(w, htmlBefore)
+    if err != nil { goto handle_err }
+
+    for _, block := range g.blocks {
+        err = block.RenderBlock(reqContext, w)
         if err != nil { goto handle_err }
-
-        for _, block := range blocks {
-            err = block.RenderBlock(reqContext, w)
-            if err != nil { goto handle_err }
-        }
-
-        _, err = fmt.Fprint(w, htmlAfter)
-        if err != nil { goto handle_err }
-
-        return
-        handle_err:
-        fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
-    })
-    err := http.ListenAndServe(fmt.Sprintf(":%d", PORT), nil)
-    if err != nil {
-        panic(err)
     }
+
+    _, err = fmt.Fprint(w, htmlAfter)
+    if err != nil { goto handle_err }
+
+    return
+    handle_err:
+    fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
 }
