@@ -59,48 +59,53 @@ const htmlAfter = `
 </html>
 `
 
-
 type GoDashboard struct {
-    blocks []RenderableBlock
+	blocks []RenderableBlock
 }
 
 func NewGoDashboard(cfg gocfg.Config) http.Handler {
-    blocks := []RenderableBlock{}
-    for k, v := range cfg {
-        if k == "" {
-            continue
-        }
-        block, err := SectionAsRenderBlock(v)
-        if err != nil {
-            panic(fmt.Errorf("while loading section '%s': %w", k, err))
-        }
-        blocks = append(blocks, block)
-        log.Printf("setting up section %s\n", k)
-    }
-    return NewGoDashboardFromBlocks(blocks...)
+	blocks := []RenderableBlock{}
+	for k, v := range cfg {
+		if k == "" {
+			continue
+		}
+		block, err := SectionAsRenderBlock(v)
+		if err != nil {
+			panic(fmt.Errorf("while loading section '%s': %w", k, err))
+		}
+		blocks = append(blocks, block)
+		log.Printf("setting up section %s\n", k)
+	}
+	return NewGoDashboardFromBlocks(blocks...)
 }
 
 func NewGoDashboardFromBlocks(blocks ...RenderableBlock) http.Handler {
-    return &GoDashboard{blocks}
+	return &GoDashboard{blocks}
 }
 
 func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    log.Printf("got connection from %s", r.RemoteAddr)
-    var err error
-    reqContext := NewRequestContext(r.Context())
+	log.Printf("got connection from %s", r.RemoteAddr)
+	var err error
+	reqContext := NewRequestContext(r.Context())
 
-    _, err = fmt.Fprint(w, htmlBefore)
-    if err != nil { goto handle_err }
+	_, err = fmt.Fprint(w, htmlBefore)
+	if err != nil {
+		goto handle_err
+	}
 
-    for _, block := range g.blocks {
-        err = block.RenderBlock(reqContext, w)
-        if err != nil { goto handle_err }
-    }
+	for _, block := range g.blocks {
+		err = block.RenderBlock(reqContext, w)
+		if err != nil {
+			goto handle_err
+		}
+	}
 
-    _, err = fmt.Fprint(w, htmlAfter)
-    if err != nil { goto handle_err }
+	_, err = fmt.Fprint(w, htmlAfter)
+	if err != nil {
+		goto handle_err
+	}
 
-    return
-    handle_err:
-    fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
+	return
+handle_err:
+	fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
 }

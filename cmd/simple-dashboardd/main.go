@@ -1,15 +1,13 @@
 package main
 
 import (
-    "github.com/lucasew/godashboard"
-    "os"
-    "github.com/lucasew/gocfg"
-    "net/http"
-    "flag"
-    "fmt"
-    "log"
-    "github.com/davecgh/go-spew/spew"
-
+	"flag"
+	"fmt"
+	"github.com/lucasew/gocfg"
+	"github.com/lucasew/godashboard"
+	"log"
+	"net/http"
+	"os"
 )
 
 const banner = `
@@ -23,26 +21,26 @@ const banner = `
 `
 
 func main() {
-    var configFile string
-    var PORT int
-    flag.StringVar(&configFile, "c", "config.cfg", "Config file with the blocks defined")
-    flag.IntVar(&PORT, "p", 8080, "Port to listen for connections")
-    flag.Parse()
-    f, err := os.Open(configFile)
-    if err != nil {
-        panic(err)
-    }
-    config := gocfg.NewConfig()
-    err = config.InjestReader(f)
-    if err != nil {
-        panic(err)
-    }
-    println(banner)
-    log.Printf("Listening in port %d", PORT)
-    dashboard := godashboard.NewGoDashboard(config)
-    err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), dashboard)
-    if err != nil {
-        panic(err)
-    }
+	var configFile string
+	var PORT int
+	flag.StringVar(&configFile, "c", "config.cfg", "Config file with the blocks defined")
+	flag.IntVar(&PORT, "p", 8080, "Port to listen for connections")
+	flag.Parse()
+	f, err := os.Open(configFile)
+	if err != nil {
+		panic(err)
+	}
+	config := gocfg.NewConfig()
+	err = config.InjestReader(f)
+	if err != nil {
+		panic(err)
+	}
+	println(banner)
+	log.Printf("Listening in port %d", PORT)
+	dashboard := godashboard.NewGoDashboard(config)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), dashboard)
+	if err != nil {
+		panic(err)
+	}
 
 }
