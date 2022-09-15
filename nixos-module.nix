@@ -16,6 +16,7 @@ in {
         default = 42069;
         type = types.port;
       };
+      openFirewall = mkEnableOption "Open the dashboard port on the firewall (recommended)";
     };
   };
   config = with lib; mkIf cfg.enable {
@@ -27,5 +28,6 @@ in {
       '';
       restartIfChanged = true;
     };
+    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.port ];
   };
 }
