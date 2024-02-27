@@ -1,15 +1,19 @@
 {config, pkgs, lib, ...}:
 let
   cfg = config.services.simple-dashboardd;
-  module = pkgs.callPackage ./default.nix {};
 in {
   options = with lib; {
     services.simple-dashboardd = {
       enable = mkEnableOption "Webapp to show system usage";
+      package = mkOption {
+        description = "Simple dashboard package";
+        type = lib.types.package;
+        default = pkgs.callPackage ./package.nix {};
+      };
       config = mkOption {
         description = "Config string to be used by simple-dashboard";
         type = types.lines;
-        default = builtins.readFile "${module}/share/simple-dashboard/config.ini.example";
+        default = builtins.readFile ./config.ini.example;
       };
       port = mkOption {
         description = "Port to listen";
@@ -22,9 +26,8 @@ in {
   config = with lib; mkIf cfg.enable {
     systemd.services.simple-dashboardd = {
       enable = true;
-      path = [ module ];
       script = ''
-        ${module}/bin/simple-dashboardd -c ${builtins.toFile "simple-dashboard.cfg" cfg.config} -p ${builtins.toString cfg.port}
+        ${lib.getExe cfg.package} -c ${builtins.toFile "simple-dashboard.cfg" cfg.config} -p ${builtins.toString cfg.port}
       '';
       restartIfChanged = true;
     };
