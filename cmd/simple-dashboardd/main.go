@@ -47,7 +47,6 @@ func main() {
 		panic(err)
 	}
 	err = http.Serve(ln, dashboard)
-	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), dashboard)
 	if err != nil {
 		panic(err)
 	}
