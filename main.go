@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/lucasew/gocfg"
 )
@@ -54,7 +53,6 @@ const htmlAfter = `
         if (!window.location.href.endsWith("#top")) {
             window.location.href = "#top"
         }
-        window.location.reload(true)
     </script>
     </body>
 </html>
@@ -105,9 +103,7 @@ func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		goto handle_err
 	}
-	w.(http.Flusher).Flush()
-	time.Sleep(time.Second)
-	fmt.Fprintln(w, "<script>window.location.reload(true)</script>")
+	fmt.Fprintln(w, "<script>setTimeout(() => window.location.reload(true), 1000)</script>")
 	return
 handle_err:
 	fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())

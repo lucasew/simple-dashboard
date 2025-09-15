@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/lucasew/go-getlistener"
 	"github.com/lucasew/gocfg"
 	"github.com/lucasew/godashboard"
