@@ -3,6 +3,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=
 github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
+github.com/lucasew/go-getlistener v0.0.0-20250915012143-7174e68e781c h1:NuX5YKuxUI1Dwl4jBl8vyYEMdDIYCK20P6etQlesM7M=
+github.com/lucasew/go-getlistener v0.0.0-20250915012143-7174e68e781c/go.mod h1:v3krqX67UtY9S59I/WYBZeO9QP7E+el8Icim99QCdLs=
 github.com/lucasew/gocfg v0.0.0-20220218183335-be6b7efdb5ab h1:DLhXz1KPJFpyBYMGFipgKB3edLryK5x9WtskFctYh58=
 github.com/lucasew/gocfg v0.0.0-20220218183335-be6b7efdb5ab/go.mod h1:kkmvQkm0PNEN5T8SD4w1ZKNu3iBrsIp951uehrO0cRM=
 github.com/lucasew/gocfg v0.0.0-20250602182938-41dffe0274da h1:jkd+o+LbJMYSDiWn2m67txAKqDa2K1rx4YXBBc++8K8=

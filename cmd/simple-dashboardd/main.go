@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/lucasew/go-getlistener"
 	"github.com/lucasew/gocfg"
 	"github.com/lucasew/godashboard"
 	"log"
@@ -24,8 +25,11 @@ func main() {
 	var configFile string
 	var PORT int
 	flag.StringVar(&configFile, "c", "config.cfg", "Config file with the blocks defined")
-	flag.IntVar(&PORT, "p", 8080, "Port to listen for connections")
+	flag.IntVar(&getlistener.PORT, "p", getlistener.PORT, "Port to listen for connections")
 	flag.Parse()
+	if getlistener.PORT == 0 {
+		getlistener.PORT = 8080
+	}
 	f, err := os.Open(configFile)
 	if err != nil {
 		panic(err)
@@ -38,6 +42,11 @@ func main() {
 	println(banner)
 	log.Printf("Listening in port %d", PORT)
 	dashboard := godashboard.NewGoDashboard(config)
+	ln, err := getlistener.GetListener()
+	if err != nil {
+		panic(err)
+	}
+	err = http.Serve(ln, dashboard)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", PORT), dashboard)
 	if err != nil {
 		panic(err)
