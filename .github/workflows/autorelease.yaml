@@ -23,7 +23,7 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
       USERNAME: ${{ github.actor }}
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Setup git config
       run: |
         git config user.name actions-bot
