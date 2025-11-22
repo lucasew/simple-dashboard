@@ -23,16 +23,16 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
       USERNAME: ${{ github.actor }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
     - name: Setup git config
       run: |
         git config user.name actions-bot
         git config user.email actions-bot@users.noreply.github.com
 
-    - uses: jdx/mise-action@v3
+    - uses: jdx/mise-action@d16887ba50704baed7de72bd1e82e04391e4457a # v3
 
     - name: Create Pull Request if there is new stuff from updaters
-      uses: peter-evans/create-pull-request@v7
+      uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7
       if: github.event_name != 'pull_request'
       id: pr_create
       with:
@@ -89,7 +89,7 @@ jobs:
           --title "$TITLE" \
           --generate-notes
 
-    - uses: svenstaro/upload-release-action@v2
+    - uses: svenstaro/upload-release-action@6b7fa9f267e90b50a19fef07b3596790bb941741 # v2
       if: env.RELEASE_VERSION != '' || github.event_name != 'pull_request'
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
