@@ -3,7 +3,7 @@ module github.com/lucasew/godashboard
 go 1.25.1
 
 require (
-	github.com/lucasew/go-getlistener v0.0.0-20250915012143-7174e68e781c
+	github.com/lucasew/go-getlistener v0.0.0-20251122022006-462871305e5e
 	github.com/lucasew/gocfg v0.0.0-20251122021911-09c8b9f23972
 	github.com/shirou/gopsutil v3.21.11+incompatible
 )
