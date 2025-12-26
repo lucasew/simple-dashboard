@@ -13,6 +13,8 @@ github.com/lucasew/gocfg v0.0.0-20250602182938-41dffe0274da h1:jkd+o+LbJMYSDiWn2
 github.com/lucasew/gocfg v0.0.0-20250602182938-41dffe0274da/go.mod h1:kkmvQkm0PNEN5T8SD4w1ZKNu3iBrsIp951uehrO0cRM=
 github.com/lucasew/gocfg v0.0.0-20251122021911-09c8b9f23972 h1:Gykg1DnqlUuyF70hcUhCy3MeLNQstbB9xA5hatmWBxo=
 github.com/lucasew/gocfg v0.0.0-20251122021911-09c8b9f23972/go.mod h1:kkmvQkm0PNEN5T8SD4w1ZKNu3iBrsIp951uehrO0cRM=
+github.com/lucasew/gocfg v0.0.0-20251220230948-b6abd4517e0e h1:6+kmVRryyPoMfR7n0Tf8L/WtJhegsdJnNsBAFWvKEYk=
+github.com/lucasew/gocfg v0.0.0-20251220230948-b6abd4517e0e/go.mod h1:kkmvQkm0PNEN5T8SD4w1ZKNu3iBrsIp951uehrO0cRM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/shirou/gopsutil v3.21.11+incompatible h1:+1+c1VGhc88SSonWP6foOcLhvnKlUeu/erjjvaPEYiI=
