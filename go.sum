@@ -9,6 +9,8 @@ github.com/lucasew/go-getlistener v0.0.0-20251122022006-462871305e5e h1:DG3B6DQM
 github.com/lucasew/go-getlistener v0.0.0-20251122022006-462871305e5e/go.mod h1:v3krqX67UtY9S59I/WYBZeO9QP7E+el8Icim99QCdLs=
 github.com/lucasew/go-getlistener v0.0.0-20251220230956-f6c03308690d h1:KpdS1THFHKtVdu6fTUkzMjo7uphQ7Japep/J+MkdW18=
 github.com/lucasew/go-getlistener v0.0.0-20251220230956-f6c03308690d/go.mod h1:v3krqX67UtY9S59I/WYBZeO9QP7E+el8Icim99QCdLs=
+github.com/lucasew/go-getlistener v0.0.0-20251228193658-45504ce8cf0e h1:nwVYTZ7VKJ0RkTeFpsSGqvfdEv9u5JMvCeVaWra4vG8=
+github.com/lucasew/go-getlistener v0.0.0-20251228193658-45504ce8cf0e/go.mod h1:v3krqX67UtY9S59I/WYBZeO9QP7E+el8Icim99QCdLs=
 github.com/lucasew/gocfg v0.0.0-20220218183335-be6b7efdb5ab h1:DLhXz1KPJFpyBYMGFipgKB3edLryK5x9WtskFctYh58=
 github.com/lucasew/gocfg v0.0.0-20220218183335-be6b7efdb5ab/go.mod h1:kkmvQkm0PNEN5T8SD4w1ZKNu3iBrsIp951uehrO0cRM=
 github.com/lucasew/gocfg v0.0.0-20250602182938-41dffe0274da h1:jkd+o+LbJMYSDiWn2m67txAKqDa2K1rx4YXBBc++8K8=
