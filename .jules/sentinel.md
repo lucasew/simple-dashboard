@@ -1,0 +1,4 @@
+## 2025-02-18 - Fix XSS in Error Handling
+**Vulnerability:** Reflected Cross-Site Scripting (XSS) in `ServeHTTP`. The application directly embeds the error message string into a JavaScript `alert` call using backticks without any escaping. If an error message contains user-controlled input or specific characters (like backticks or `</script>`), it allows executing arbitrary JavaScript in the victim's browser.
+**Learning:** Never trust string formatting to generate code (HTML, JS, SQL). Direct string interpolation into a `<script>` context is particularly dangerous because it bypasses many automatic protections provided by HTML templating engines.
+**Prevention:** Use context-aware encoding. For inserting data into JavaScript, JSON serialization (`json.Marshal`) is a safe and robust way to escape strings, as it handles quotes, backslashes, and control characters correctly.
