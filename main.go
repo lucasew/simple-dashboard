@@ -1,6 +1,7 @@
 package godashboard
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -106,5 +107,6 @@ func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "<script>setTimeout(() => window.location.reload(true), 1000)</script>")
 	return
 handle_err:
-	fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
+	errBytes, _ := json.Marshal(err.Error())
+	fmt.Fprintf(w, "<script>alert(%s)</script>", string(errBytes))
 }
