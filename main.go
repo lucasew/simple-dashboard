@@ -8,8 +8,6 @@ import (
 	"github.com/lucasew/gocfg"
 )
 
-var PORT int
-
 const htmlBefore = `
 <html>
     <head>

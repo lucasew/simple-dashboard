@@ -22,7 +22,6 @@ const banner = `
 
 func main() {
 	var configFile string
-	var PORT int
 	flag.StringVar(&configFile, "c", "config.cfg", "Config file with the blocks defined")
 	flag.IntVar(&getlistener.PORT, "p", getlistener.PORT, "Port to listen for connections")
 	flag.Parse()
@@ -39,7 +38,7 @@ func main() {
 		panic(err)
 	}
 	println(banner)
-	log.Printf("Listening in port %d", PORT)
+	log.Printf("Listening in port %d", getlistener.PORT)
 	dashboard := godashboard.NewGoDashboard(config)
 	ln, err := getlistener.GetListener()
 	if err != nil {
