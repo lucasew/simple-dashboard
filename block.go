@@ -27,28 +27,33 @@ type LabelBlock struct {
 	background_color *template.Template
 }
 
+func getInt(section gocfg.SectionProvider, key string, defaultVal int) (int, error) {
+	if !section.RawHasKey(key) {
+		return defaultVal, nil
+	}
+	r, err := strconv.Atoi(section.RawGet(key))
+	if err != nil {
+		return 0, fmt.Errorf("while getting %s: %w", key, err)
+	}
+	return r, nil
+}
+
 func SectionAsRenderBlock(section gocfg.SectionProvider) (RenderableBlock, error) {
-	size_x := 1
-	size_y := 1
-	if section.RawHasKey("size_x") {
-		r, err := strconv.Atoi(section.RawGet("size_x"))
-		if err != nil {
-			return nil, fmt.Errorf("while getting size_x: %w", err)
-		}
-		size_x = r
+	size_x, err := getInt(section, "size_x", 1)
+	if err != nil {
+		return nil, err
 	}
-	if section.RawHasKey("size_y") {
-		r, err := strconv.Atoi(section.RawGet("size_y"))
-		if err != nil {
-			return nil, fmt.Errorf("while getting size_y: %w", err)
-		}
-		size_y = r
+
+	size_y, err := getInt(section, "size_y", 1)
+	if err != nil {
+		return nil, err
 	}
+
 	if section.RawHasKey("background_image") && section.RawHasKey("background_color") {
-		return nil, fmt.Errorf("a section cant have both a background_image and a background_color")
+		return nil, fmt.Errorf("a section can't have both a background_image and a background_color")
 	}
 	if section.RawHasKey("background_image") && section.RawHasKey("label") {
-		return nil, fmt.Errorf("a section cant have both a background_image and a label")
+		return nil, fmt.Errorf("a section can't have both a background_image and a label")
 	}
 	if section.RawHasKey("background_image") {
 		tpl, err := template.New("background_image").Parse(section.RawGet("background_image"))
