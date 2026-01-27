@@ -1,2 +1,49 @@
 [tools]
 go = "1.25.6"
+
+[tasks.install]
+run = """
+go mod download
+# Build golangci-lint from source to match the project's Go version (1.25+),
+# preventing "built with lower Go version" errors from pre-built binaries.
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.63.4
+"""
+
+[tasks."lint:golangci-lint"]
+run = "golangci-lint run"
+
+[tasks.lint]
+depends = ["lint:*"]
+
+[tasks."fmt:go"]
+run = "go fmt ./..."
+
+[tasks.fmt]
+depends = ["fmt:*"]
+
+[tasks.test]
+run = "go test -v ./..."
+
+[tasks.codegen]
+run = "go mod tidy"
+
+[tasks.ci]
+depends = ["lint", "test"]
+
+[tasks.build]
+run = """
+mkdir build -p
+echo "# Built targets"
+export CGO_ENABLED=0
+go tool dist list | grep -v wasm | while IFS=/ read -r GOOS GOARCH; do
+  echo "Building $GOOS/$GOARCH..."
+  GOOS=$GOOS GOARCH=$GOARCH go build -v -o build/simple-dashboardd-$GOOS-$GOARCH ./cmd/simple-dashboardd || true
+done
+"""
+
+[tasks."release:prepare"]
+run = """
+if [[ ! -z "$NEW_VERSION" ]]; then
+  NO_TAG=1 ./make_release "$NEW_VERSION"
+fi
+"""
