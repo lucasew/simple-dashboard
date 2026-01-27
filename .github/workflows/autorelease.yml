@@ -1,0 +1,73 @@
+name: Autorelease
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: 'New tag version'
+        default: 'patch'
+
+jobs:
+  autorelease:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: jdx/mise-action@v3
+
+      - name: Install
+        run: mise run install
+
+      - name: Codegen
+        run: mise run codegen
+
+      - name: Create Pull Request if Codegen Changed Files
+        uses: peter-evans/create-pull-request@v6
+        if: github.event_name != 'pull_request'
+        with:
+          commit-message: "chore: update generated files"
+          branch: "chore/codegen-update"
+          delete-branch: true
+          title: "chore: update generated files"
+          body: "This PR updates generated files based on the latest changes."
+
+      - name: CI
+        run: mise run ci
+
+      - name: Build Binaries
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          mkdir build -p
+          export CGO_ENABLED=0
+          go tool dist list | grep -v wasm | while IFS=/ read -r GOOS GOARCH; do
+            echo "Building $GOOS/$GOARCH"
+            GOOS=$GOOS GOARCH=$GOARCH go build -v -o build/simple-dashboardd-$GOOS-$GOARCH ./cmd/simple-dashboardd
+          done
+
+      - name: Make Release
+        if: github.event_name == 'workflow_dispatch' && inputs.new_version != ''
+        env:
+          NEW_VERSION: ${{ inputs.new_version }}
+        run: |
+          # Bumps version in version.txt
+          NO_TAG=1 ./make_release "$NEW_VERSION"
+          echo "RELEASE_VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
+      - name: Create Release
+        if: github.event_name == 'workflow_dispatch' && env.RELEASE_VERSION != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ env.RELEASE_VERSION }}
+        run: |
+          gh release create "$TAG" build/* --title "Release $TAG" --generate-notes

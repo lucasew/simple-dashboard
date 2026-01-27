@@ -1,2 +1,16 @@
+[env]
+_.path = ["{{env.HOME}}/go/bin", "/usr/local/go/bin"]
+GOTOOLCHAIN = "go1.25.6"
+
 [tools]
 go = "1.25.6"
+
+[tasks]
+"install" = "go mod download"
+"codegen" = "go generate ./..."
+"lint:golangci-lint" = "go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8 run"
+"lint" = { depends = ["lint:*"] }
+"fmt:go" = "gofmt -w -s ."
+"fmt" = { depends = ["fmt:*"] }
+"test" = "go test ./..."
+"ci" = { depends = ["lint", "test"] }
