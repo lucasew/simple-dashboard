@@ -31,6 +31,12 @@ jobs:
 
     - uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3
 
+    - name: Install
+      run: mise run install
+
+    - name: Codegen
+      run: mise run codegen
+
     - name: Create Pull Request if there is new stuff from updaters
       uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725 # v8
       if: github.event_name != 'pull_request'
@@ -53,19 +59,13 @@ jobs:
           exit 1
         fi
 
+    - name: CI
+      run: mise run ci
+
     - name: Build binaries
       env:
         TAG: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      run: |
-        mkdir build -p && ls && pwd
-
-        echo "# Built targets" >> $GITHUB_STEP_SUMMARY
-        export CGO_ENABLED=0
-        go tool dist list | grep -v wasm | while IFS=/ read -r GOOS GOARCH; do
-          echo "::group::Build $GOOS/$GOARCH"
-          GOOS=$GOOS GOARCH=$GOARCH go build -v -o build/simple-dashboardd-$GOOS-$GOARCH ./cmd/simple-dashboardd && (echo "- $GOOS/$GOARCH" >> $GITHUB_STEP_SUMMARY) || true
-          echo "::endgroup::"
-        done
+      run: mise run build
 
     - name: Make release if everything looks right
       if: github.event_name != 'pull_request'

@@ -3,8 +3,8 @@ package godashboard
 import (
 	"errors"
 	"fmt"
-	"io"
 	"html/template"
+	"io"
 	"strconv"
 
 	"github.com/lucasew/gocfg"
