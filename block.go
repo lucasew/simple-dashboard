@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"html/template"
 	"strconv"
-	"text/template"
 
 	"github.com/lucasew/gocfg"
 )
