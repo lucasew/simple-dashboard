@@ -1,0 +1,31 @@
+[tools]
+go = "1.25.6"
+golangci-lint = "latest"
+
+[tasks]
+install = "go mod download"
+codegen = "go generate ./..."
+"lint:golangci-lint" = "golangci-lint run"
+lint = { depends = ["lint:*"] }
+"fmt:go" = "go fmt ./..."
+fmt = { depends = ["fmt:*"] }
+test = "go test -v ./..."
+ci = { depends = ["lint", "test", "build"] }
+
+[tasks.build]
+run = """
+mkdir -p build
+if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+    echo "# Built targets" >> "$GITHUB_STEP_SUMMARY"
+fi
+
+export CGO_ENABLED=0
+go tool dist list | grep -v wasm | while IFS=/ read -r GOOS GOARCH; do
+    echo "Building $GOOS/$GOARCH"
+    if GOOS=$GOOS GOARCH=$GOARCH go build -v -o build/simple-dashboardd-$GOOS-$GOARCH ./cmd/simple-dashboardd; then
+        if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+            echo "- $GOOS/$GOARCH" >> "$GITHUB_STEP_SUMMARY"
+        fi
+    fi
+done
+"""
