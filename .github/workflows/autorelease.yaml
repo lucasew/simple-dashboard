@@ -84,11 +84,10 @@ jobs:
           --title "$TITLE" \
           --generate-notes
 
-    - uses: svenstaro/upload-release-action@v2
+    - name: Upload release assets
       if: env.RELEASE_VERSION != ''
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/*
-        tag: ${{ env.RELEASE_VERSION }}
-        overwrite: true
-        file_glob: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ env.RELEASE_VERSION }}
+      run: |
+        gh release upload "$TAG" build/* --clobber
