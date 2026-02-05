@@ -114,30 +114,45 @@ func (l LabelBlock) SizeY() int {
 }
 
 func (b BackgroundImageBlock) RenderBlock(ctx *RequestContext, w io.Writer) error {
-	fmt.Fprintf(w, `<img class="box" width="%d" height="%d" src="`, b.sx*ctx.sizeBaseline, b.sy*ctx.sizeBaseline)
-	err := b.image_url.Execute(w, ctx)
+	_, err := fmt.Fprintf(w, `<img class="box" width="%d" height="%d" src="`, b.sx*ctx.sizeBaseline, b.sy*ctx.sizeBaseline)
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(w, `">`)
-	return nil
+	err = b.image_url.Execute(w, ctx)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprintf(w, `">`)
+	return err
 }
 
 func (l LabelBlock) RenderBlock(ctx *RequestContext, w io.Writer) error {
 	sx := l.sx * ctx.sizeBaseline
 	sy := l.sy * ctx.sizeBaseline
-	fmt.Fprintf(w, `<svg class="box" viewBox="0 0 %d %d" width="%d" height="%d">`, sx, sy, sx, sy)
-	fmt.Fprint(w, `<rect style="fill:`)
-	err := l.background_color.Execute(w, ctx)
+	_, err := fmt.Fprintf(w, `<svg class="box" viewBox="0 0 %d %d" width="%d" height="%d">`, sx, sy, sx, sy)
 	if err != nil {
 		return err
 	}
-	fmt.Fprint(w, `;" x="0%" y="0%" height="100%" width="100%" />`)
-	fmt.Fprint(w, `<text x="50%" y="50%" font-size="2rem" text-anchor="middle" dominant-baseline="middle">`)
+	_, err = fmt.Fprint(w, `<rect style="fill:`)
+	if err != nil {
+		return err
+	}
+	err = l.background_color.Execute(w, ctx)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprint(w, `;" x="0%" y="0%" height="100%" width="100%" />`)
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprint(w, `<text x="50%" y="50%" font-size="2rem" text-anchor="middle" dominant-baseline="middle">`)
+	if err != nil {
+		return err
+	}
 	err = l.label.Execute(w, ctx)
 	if err != nil {
 		return err
 	}
-	fmt.Fprint(w, `</text></svg>`)
-	return nil
+	_, err = fmt.Fprint(w, `</text></svg>`)
+	return err
 }

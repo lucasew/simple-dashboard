@@ -103,8 +103,12 @@ func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		goto handle_err
 	}
-	fmt.Fprintln(w, "<script>setTimeout(() => window.location.reload(true), 1000)</script>")
+	_, err = fmt.Fprintln(w, "<script>setTimeout(() => window.location.reload(true), 1000)</script>")
+	if err != nil {
+		goto handle_err
+	}
 	return
 handle_err:
-	fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
+	// If we can't write to w, there's not much we can do.
+	_, _ = fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
 }

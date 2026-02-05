@@ -6,3 +6,4 @@ golangci-lint = "latest"
 build = "go build ./..."
 test = "go test ./..."
 lint = "golangci-lint run"
+ci = { depends = ["test", "lint", "build"] }
