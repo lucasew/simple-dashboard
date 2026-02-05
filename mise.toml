@@ -1,2 +1,8 @@
 [tools]
 go = "1.25.6"
+golangci-lint = "latest"
+
+[tasks]
+build = "go build ./..."
+test = "go test ./..."
+lint = "golangci-lint run"
