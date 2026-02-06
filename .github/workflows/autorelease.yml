@@ -21,6 +21,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      checks: write
+      statuses: write
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
@@ -31,7 +33,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Tools
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v3.6.1
 
       - name: Install Dependencies
         run: mise run install
