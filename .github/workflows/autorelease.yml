@@ -33,7 +33,11 @@ jobs:
           fetch-depth: 0
 
       - name: Install Tools
-        uses: jdx/mise-action@v3.6.1
+        run: |
+          curl https://mise.run | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
+          $HOME/.local/bin/mise install
 
       - name: Install Dependencies
         run: mise run install
