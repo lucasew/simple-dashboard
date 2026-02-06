@@ -36,7 +36,16 @@ jobs:
         git config user.name actions-bot
         git config user.email actions-bot@users.noreply.github.com
 
-    - uses: jdx/mise-action@v2
+    - name: Install mise manually
+      run: |
+        curl https://mise.jdx.dev/install.sh | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
+
+    - name: Install tools
+      run: ~/.local/bin/mise install
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Pull Request if there is new stuff from updaters
       uses: peter-evans/create-pull-request@v6
@@ -69,7 +78,7 @@ jobs:
         echo "# Built targets" >> $GITHUB_STEP_SUMMARY
         export CGO_ENABLED=0
         echo "::group::Build linux/amd64"
-        GOOS=linux GOARCH=amd64 go build -v -o build/simple-dashboardd-linux-amd64 ./cmd/simple-dashboardd && (echo "- linux/amd64" >> $GITHUB_STEP_SUMMARY)
+        GOOS=linux GOARCH=amd64 ~/.local/bin/mise exec -- go build -v -o build/simple-dashboardd-linux-amd64 ./cmd/simple-dashboardd && (echo "- linux/amd64" >> $GITHUB_STEP_SUMMARY)
         echo "::endgroup::"
 
     - name: Make release if everything looks right
