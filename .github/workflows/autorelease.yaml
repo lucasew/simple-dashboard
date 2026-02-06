@@ -30,16 +30,16 @@ jobs:
       IMAGE_NAME: ${{ github.repository }}
       USERNAME: ${{ github.actor }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
     - name: Setup git config
       run: |
         git config user.name actions-bot
         git config user.email actions-bot@users.noreply.github.com
 
-    - uses: jdx/mise-action@v3
+    - uses: jdx/mise-action@6d1e696aa24c1aa1bcc1adea0212707c71ab78a8 # v3
 
     - name: Create Pull Request if there is new stuff from updaters
-      uses: peter-evans/create-pull-request@v6
+      uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725 # v8
       if: github.event_name != 'pull_request'
       id: pr_create
       with:
@@ -68,9 +68,11 @@ jobs:
 
         echo "# Built targets" >> $GITHUB_STEP_SUMMARY
         export CGO_ENABLED=0
-        echo "::group::Build linux/amd64"
-        GOOS=linux GOARCH=amd64 go build -v -o build/simple-dashboardd-linux-amd64 ./cmd/simple-dashboardd && (echo "- linux/amd64" >> $GITHUB_STEP_SUMMARY)
-        echo "::endgroup::"
+        go tool dist list | grep -v wasm | while IFS=/ read -r GOOS GOARCH; do
+          echo "::group::Build $GOOS/$GOARCH"
+          GOOS=$GOOS GOARCH=$GOARCH go build -v -o build/simple-dashboardd-$GOOS-$GOARCH ./cmd/simple-dashboardd && (echo "- $GOOS/$GOARCH" >> $GITHUB_STEP_SUMMARY) || true
+          echo "::endgroup::"
+        done
 
     - name: Make release if everything looks right
       if: github.event_name != 'pull_request'
@@ -94,7 +96,7 @@ jobs:
           --title "$TITLE" \
           --generate-notes
 
-    - uses: svenstaro/upload-release-action@v2
+    - uses: svenstaro/upload-release-action@6b7fa9f267e90b50a19fef07b3596790bb941741 # v2
       if: env.RELEASE_VERSION != '' || github.event_name != 'pull_request'
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
