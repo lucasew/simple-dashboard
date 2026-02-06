@@ -1,0 +1,105 @@
+name: Autorelease
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: 'New tag version'
+        default: 'patch'
+  schedule:
+    - cron: '0 2 * * 6'
+
+jobs:
+  autorelease:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+      USERNAME: ${{ github.actor }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Tools
+        run: |
+          curl https://mise.run | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
+          $HOME/.local/bin/mise install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Dependencies
+        run: mise run install
+
+      - name: Codegen
+        run: mise run codegen
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        if: github.event_name != 'pull_request'
+        id: pr_create
+        with:
+          commit-message: Updater script changes
+          branch: updater-bot
+          delete-branch: true
+          title: "Updater: stuff changed"
+          body: |
+            Changes caused from update scripts
+
+      - name: Stop if PR created
+        if: steps.pr_create.outputs.pull-request-number != ''
+        run: |
+          echo "PR created. Stopping." >> $GITHUB_STEP_SUMMARY
+          exit 1
+
+      - name: CI
+        run: mise run ci
+
+      - name: Release
+        if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ github.event.inputs.new_version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          TAG=""
+          TITLE=""
+          TARGET_COMMIT=""
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "$NEW_VERSION" ]]; then
+             echo "Bumping version to $NEW_VERSION"
+             git checkout master
+             NO_TAG=1 ./make_release "$NEW_VERSION"
+             RELEASE_VERSION=$(cat version.txt)
+             TAG="$RELEASE_VERSION"
+             TITLE="Release $RELEASE_VERSION"
+             TARGET_COMMIT=$(git rev-parse HEAD)
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+             TAG=${GITHUB_REF#refs/tags/}
+             TITLE="Release $TAG"
+             TARGET_COMMIT=${GITHUB_SHA}
+          fi
+
+          if [[ -n "$TAG" ]]; then
+            ./scripts/build_release.sh
+
+            GH_ARGS=(release create "$TAG" --title "$TITLE" --generate-notes)
+            if [[ -n "$TARGET_COMMIT" ]]; then
+               GH_ARGS+=(--target "$TARGET_COMMIT")
+            fi
+
+            gh "${GH_ARGS[@]}" build/*
+          fi

@@ -1,9 +1,18 @@
 [tools]
 go = "1.25.7"
 golangci-lint = "latest"
+shellcheck = "latest"
 
 [tasks]
-build = "go build ./..."
-test = "go test ./..."
-lint = "golangci-lint run"
-ci = { depends = ["test", "lint", "build"] }
+"lint:go" = "golangci-lint run"
+"lint:shell" = "shellcheck scripts/*.sh make_release"
+lint = { depends = ["lint:*"] }
+"fmt:go" = "go fmt ./..."
+fmt = { depends = ["fmt:*"] }
+"test:go" = "go test ./..."
+test = { depends = ["test:*"] }
+"install:go" = "go mod download"
+install = { depends = ["install:*"] }
+"codegen:go" = "go generate ./..."
+codegen = { depends = ["codegen:*"] }
+ci = { depends = ["lint", "test"] }
