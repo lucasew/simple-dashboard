@@ -6,13 +6,13 @@ shellcheck = "latest"
 [tasks]
 "lint:go" = "golangci-lint run"
 "lint:shell" = "shellcheck scripts/*.sh make_release"
-lint = { depends = ["lint:go", "lint:shell"] }
+lint = { depends = ["lint:*"] }
 "fmt:go" = "go fmt ./..."
-fmt = { depends = ["fmt:go"] }
+fmt = { depends = ["fmt:*"] }
 "test:go" = "go test ./..."
-test = { depends = ["test:go"] }
+test = { depends = ["test:*"] }
 "install:go" = "go mod download"
-install = { depends = ["install:go"] }
+install = { depends = ["install:*"] }
 "codegen:go" = "go generate ./..."
-codegen = { depends = ["codegen:go"] }
+codegen = { depends = ["codegen:*"] }
 ci = { depends = ["lint", "test"] }

@@ -1,6 +1,6 @@
 module github.com/lucasew/godashboard
 
-go 1.25.1
+go 1.25.7
 
 require (
 	github.com/lucasew/go-getlistener v0.0.0-20251228193658-45504ce8cf0e
