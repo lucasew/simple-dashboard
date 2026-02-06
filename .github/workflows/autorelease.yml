@@ -68,7 +68,7 @@ jobs:
 
         echo "# Built targets" >> $GITHUB_STEP_SUMMARY
         export CGO_ENABLED=0
-        go tool dist list | grep -E 'linux|darwin|freebsd|openbsd' | grep -v wasm | while IFS=/ read -r GOOS GOARCH; do
+        go tool dist list | grep -E 'linux|darwin' | grep -v wasm | while IFS=/ read -r GOOS GOARCH; do
           echo "::group::Build $GOOS/$GOARCH"
           GOOS=$GOOS GOARCH=$GOARCH go build -v -o build/simple-dashboardd-$GOOS-$GOARCH ./cmd/simple-dashboardd && (echo "- $GOOS/$GOARCH" >> $GITHUB_STEP_SUMMARY) || true
           echo "::endgroup::"
