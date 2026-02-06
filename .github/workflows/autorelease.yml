@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Tools
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@v3
 
       - name: Install Dependencies
         run: mise run install
