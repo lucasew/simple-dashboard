@@ -9,7 +9,10 @@ shellcheck = "latest"
 lint = { depends = ["lint:*"] }
 "fmt:go" = "go fmt ./..."
 fmt = { depends = ["fmt:*"] }
-test = "go test ./..."
-install = "go mod download"
-codegen = "go generate ./..."
+"test:go" = "go test ./..."
+test = { depends = ["test:*"] }
+"install:go" = "go mod download"
+install = { depends = ["install:*"] }
+"codegen:go" = "go generate ./..."
+codegen = { depends = ["codegen:*"] }
 ci = { depends = ["lint", "test"] }
