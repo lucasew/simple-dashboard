@@ -21,8 +21,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      checks: write
-      statuses: write
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
@@ -38,6 +36,8 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           echo "$HOME/.local/share/mise/shims" >> $GITHUB_PATH
           $HOME/.local/bin/mise install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Dependencies
         run: mise run install
