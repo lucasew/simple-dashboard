@@ -15,13 +15,6 @@ on:
         default: 'patch'
   schedule:
     - cron: '0 2 * * 6' # saturday 2am
-
-permissions:
-  contents: write
-  pull-requests: write
-  checks: write
-  statuses: write
-
 jobs:
   autorelease:
     runs-on: ubuntu-latest
