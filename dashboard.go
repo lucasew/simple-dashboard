@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 
 	"github.com/lucasew/gocfg"
 )
@@ -63,11 +64,18 @@ type GoDashboard struct {
 }
 
 func NewGoDashboard(cfg gocfg.Config) http.Handler {
+	keys := make([]string, 0, len(cfg))
+	for k := range cfg {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	blocks := []RenderableBlock{}
-	for k, v := range cfg {
+	for _, k := range keys {
 		if k == "" {
 			continue
 		}
+		v := cfg[k]
 		block, err := SectionAsRenderBlock(v)
 		if err != nil {
 			panic(fmt.Errorf("while loading section '%s': %w", k, err))
