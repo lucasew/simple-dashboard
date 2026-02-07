@@ -114,3 +114,16 @@ func TestSectionAsRenderBlock_Errors(t *testing.T) {
 		t.Error("Expected error for invalid size_x")
 	}
 }
+
+func TestSectionAsRenderBlock_InvalidBackgroundColor(t *testing.T) {
+	section := MockSectionProvider{
+		"label":            "L",
+		"background_color": "{{",
+	}
+	_, err := SectionAsRenderBlock(section)
+	if err == nil {
+		t.Error("Expected error for invalid background_color template")
+	} else if !strings.Contains(err.Error(), "invalid background_color template") {
+		t.Errorf("Expected error message to contain 'invalid background_color template', got '%s'", err.Error())
+	}
+}

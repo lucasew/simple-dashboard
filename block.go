@@ -88,7 +88,7 @@ func createLabelBlock(section gocfg.SectionProvider, sx, sy int) (RenderableBloc
 	}
 	tpl_color, err := template.New("bg_color").Parse(section.RawGet("background_color"))
 	if err != nil {
-		return nil, fmt.Errorf("invalid label template: %w", err)
+		return nil, fmt.Errorf("invalid background_color template: %w", err)
 	}
 	return LabelBlock{
 		sx: sx, sy: sy,
