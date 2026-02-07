@@ -1,0 +1,1 @@
+- 2026-02-07: Map iteration is non-deterministic; sort keys for consistent output.
