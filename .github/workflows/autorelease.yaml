@@ -89,7 +89,7 @@ jobs:
           --title "$TITLE" \
           --generate-notes
 
-    - uses: svenstaro/upload-release-action@6b7fa9f267e90b50a19fef07b3596790bb941741 # v2
+    - uses: svenstaro/upload-release-action@b98a3b12e86552593f3e4e577ca8a62aa2f3f22b # v2
       if: env.RELEASE_VERSION != '' || github.event_name != 'pull_request'
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
