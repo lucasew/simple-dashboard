@@ -1,9 +1,12 @@
 [tools]
 go = "1.25.7"
-golangci-lint = "latest"
+golangci-lint = "2.12.2"
+shellcheck = "0.10.0"
 
 [tasks]
 build = "go build ./..."
 test = "go test ./..."
-lint = "golangci-lint run"
+"lint:go" = "golangci-lint run"
+"lint:sh" = "shellcheck make_release"
+lint = { depends = ["lint:go", "lint:sh"] }
 ci = { depends = ["test", "lint", "build"] }

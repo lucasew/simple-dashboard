@@ -1,23 +1,24 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-if [ $# == 1 ]; then
-	VERSION="$1"; shift
+if [ "$#" -eq 1 ]; then
+	VERSION="$1"
+	shift
 else
-	echo ./make_release versao_nova >&2
+	echo "./make_release versao_nova" >&2
 	exit 1
 fi
 
-CURRENT_VERSION=($(cat version.txt | sed 's;\.; ;g'))
+IFS='.' read -r v_major v_minor v_patch < version.txt
 
 case "$VERSION" in
 	patch)
-		VERSION="${CURRENT_VERSION[0]}.${CURRENT_VERSION[1]}.$((${CURRENT_VERSION[2]}+1))"
+		VERSION="${v_major}.${v_minor}.$((v_patch + 1))"
 	;;
 	minor)
-		VERSION="${CURRENT_VERSION[0]}.$((${CURRENT_VERSION[1]}+1)).0"
+		VERSION="${v_major}.$((v_minor + 1)).0"
 	;;
 	major)
-		VERSION="$((${CURRENT_VERSION[0]}+1)).0.0"
+		VERSION="$((v_major + 1)).0.0"
 	;;
 esac
 
@@ -27,7 +28,7 @@ printf "%s" "$VERSION" > version.txt
 
 git add -A
 git commit -sm "bump to $VERSION"
-if [[ ! -v NO_TAG ]]; then
+if [ -z "${NO_TAG+x}" ]; then
 	git tag "$VERSION"
 	git push --tag
 fi

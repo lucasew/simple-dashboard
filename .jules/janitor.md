@@ -1,0 +1,1 @@
+- 2026-06-30: [Janitor] Fixed make_release to be POSIX sh compliant, resolved all shellcheck warnings, and added script linting to mise.toml tasks.
