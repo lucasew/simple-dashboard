@@ -70,6 +70,7 @@ func NewGoDashboard(cfg gocfg.Config) http.Handler {
 		}
 		block, err := SectionAsRenderBlock(v)
 		if err != nil {
+			ReportError(err, fmt.Sprintf("while loading section '%s'", k))
 			panic(fmt.Errorf("while loading section '%s': %w", k, err))
 		}
 		blocks = append(blocks, block)
@@ -109,6 +110,7 @@ func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	return
 handle_err:
+	ReportError(err, "ServeHTTP encountered an error rendering the dashboard")
 	// If we can't write to w, there's not much we can do.
 	_, _ = fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
 }

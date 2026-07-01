@@ -30,11 +30,13 @@ func main() {
 	}
 	f, err := os.Open(configFile)
 	if err != nil {
+		godashboard.ReportError(err, "failed to open config file")
 		panic(err)
 	}
 	config := gocfg.NewConfig()
 	err = config.InjestReader(f)
 	if err != nil {
+		godashboard.ReportError(err, "failed to ingest config reader")
 		panic(err)
 	}
 	println(banner)
@@ -42,10 +44,12 @@ func main() {
 	dashboard := godashboard.NewGoDashboard(config)
 	ln, err := getlistener.GetListener()
 	if err != nil {
+		godashboard.ReportError(err, "failed to get listener")
 		panic(err)
 	}
 	err = http.Serve(ln, dashboard)
 	if err != nil {
+		godashboard.ReportError(err, "failed to serve HTTP")
 		panic(err)
 	}
 
