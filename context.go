@@ -100,36 +100,28 @@ func (r *RequestContext) AvgLoad() (*load.AvgStat, error) {
 	return load.AvgWithContext(r.context)
 }
 
-func (r *RequestContext) ProcsRunning() (int, error) {
+func (r *RequestContext) getMiscStat(extractor func(*load.MiscStat) int) (int, error) {
 	misc, err := load.MiscWithContext(r.context)
 	if err != nil {
 		return 0, err
 	}
-	return misc.ProcsRunning, nil
+	return extractor(misc), nil
+}
+
+func (r *RequestContext) ProcsRunning() (int, error) {
+	return r.getMiscStat(func(m *load.MiscStat) int { return m.ProcsRunning })
 }
 
 func (r *RequestContext) ProcsTotal() (int, error) {
-	misc, err := load.MiscWithContext(r.context)
-	if err != nil {
-		return 0, err
-	}
-	return misc.ProcsTotal, nil
+	return r.getMiscStat(func(m *load.MiscStat) int { return m.ProcsTotal })
 }
 
 func (r *RequestContext) ProcsCreated() (int, error) {
-	misc, err := load.MiscWithContext(r.context)
-	if err != nil {
-		return 0, err
-	}
-	return misc.ProcsCreated, nil
+	return r.getMiscStat(func(m *load.MiscStat) int { return m.ProcsCreated })
 }
 
 func (r *RequestContext) ProcsBlocked() (int, error) {
-	misc, err := load.MiscWithContext(r.context)
-	if err != nil {
-		return 0, err
-	}
-	return misc.ProcsBlocked, nil
+	return r.getMiscStat(func(m *load.MiscStat) int { return m.ProcsBlocked })
 }
 
 func (r *RequestContext) Memory() (*mem.VirtualMemoryStat, error) {
