@@ -1,0 +1,16 @@
+This PR addresses technical debt in `block.go` by removing duplicated logic for `SizeX` and `SizeY` fields and methods between `BackgroundImageBlock` and `LabelBlock`. It also fixes a minor copy-paste typo in the error message for background color template parsing.
+
+### Assumptions
+- Refactoring `BackgroundImageBlock` and `LabelBlock` to embed a common struct for size dimensions will maintain backwards compatibility due to Go's struct embedding mechanisms.
+- The `sx` and `sy` fields logic being identical between the two implementations indicates they are conceptually the same and warrant extraction to a shared base.
+
+### Alternatives Not Chosen
+- Continuing to maintain duplicated `SizeX` and `SizeY` methods, which makes the code more verbose and prone to drifting apart over time if modifications are needed.
+- Defining a new interface or using type assertions for these fields, which would be unnecessarily complex and less idiomatic compared to struct embedding for shared state.
+
+### How To Pivot
+- If struct embedding causes unintended side effects with template rendering or reflection, the changes can be easily reverted, and we can explore using accessor methods strictly without shared state.
+
+### Next Knobs
+1. Investigate other types implementing `RenderableBlock` to ensure they also don't duplicate state unnecessarily.
+2. Consider applying this abstraction pattern to other UI component definitions if we add more block types in the future.

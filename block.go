@@ -16,13 +16,17 @@ type RenderableBlock interface {
 	RenderBlock(*RequestContext, io.Writer) error
 }
 
+type BaseBlock struct {
+	sx, sy int
+}
+
 type BackgroundImageBlock struct {
-	sx, sy    int
+	BaseBlock
 	image_url *template.Template
 }
 
 type LabelBlock struct {
-	sx, sy           int
+	BaseBlock
 	label            *template.Template
 	background_color *template.Template
 }
@@ -76,7 +80,7 @@ func createBackgroundImageBlock(section gocfg.SectionProvider, sx, sy int) (Rend
 		return nil, fmt.Errorf("invalid background_image template: %w", err)
 	}
 	return BackgroundImageBlock{
-		sx: sx, sy: sy,
+		BaseBlock: BaseBlock{sx: sx, sy: sy},
 		image_url: tpl,
 	}, nil
 }
@@ -88,29 +92,21 @@ func createLabelBlock(section gocfg.SectionProvider, sx, sy int) (RenderableBloc
 	}
 	tpl_color, err := template.New("bg_color").Parse(section.RawGet("background_color"))
 	if err != nil {
-		return nil, fmt.Errorf("invalid label template: %w", err)
+		return nil, fmt.Errorf("invalid background_color template: %w", err)
 	}
 	return LabelBlock{
-		sx: sx, sy: sy,
+		BaseBlock:        BaseBlock{sx: sx, sy: sy},
 		label:            tpl_label,
 		background_color: tpl_color,
 	}, nil
 }
 
-func (b BackgroundImageBlock) SizeX() int {
+func (b BaseBlock) SizeX() int {
 	return b.sx
 }
 
-func (l LabelBlock) SizeX() int {
-	return l.sx
-}
-
-func (b BackgroundImageBlock) SizeY() int {
+func (b BaseBlock) SizeY() int {
 	return b.sy
-}
-
-func (l LabelBlock) SizeY() int {
-	return l.sy
 }
 
 func (b BackgroundImageBlock) RenderBlock(ctx *RequestContext, w io.Writer) error {
