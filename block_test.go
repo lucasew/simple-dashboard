@@ -24,6 +24,17 @@ func (m MockSectionProvider) RawSet(key, value string) bool {
 	return true
 }
 
+func renderBlockHelper(t *testing.T, block RenderableBlock) string {
+	t.Helper()
+	ctx := NewRequestContext(context.Background())
+	var buf bytes.Buffer
+	err := block.RenderBlock(ctx, &buf)
+	if err != nil {
+		t.Fatalf("Render failed: %v", err)
+	}
+	return buf.String()
+}
+
 func TestSectionAsRenderBlock_BackgroundImage(t *testing.T) {
 	section := MockSectionProvider{
 		"background_image": "http://example.com/image.png",
@@ -44,14 +55,7 @@ func TestSectionAsRenderBlock_BackgroundImage(t *testing.T) {
 	}
 
 	// Test Render
-	ctx := NewRequestContext(context.Background())
-	var buf bytes.Buffer
-	err = block.RenderBlock(ctx, &buf)
-	if err != nil {
-		t.Fatalf("Render failed: %v", err)
-	}
-
-	output := buf.String()
+	output := renderBlockHelper(t, block)
 	expectedWidth := "200"
 	if !strings.Contains(output, `width="`+expectedWidth+`"`) {
 		t.Errorf("Expected width %s in output, got %s", expectedWidth, output)
@@ -77,13 +81,7 @@ func TestSectionAsRenderBlock_Label(t *testing.T) {
 	}
 
 	// Test Render
-	ctx := NewRequestContext(context.Background())
-	var buf bytes.Buffer
-	err = block.RenderBlock(ctx, &buf)
-	if err != nil {
-		t.Fatalf("Render failed: %v", err)
-	}
-	output := buf.String()
+	output := renderBlockHelper(t, block)
 	if !strings.Contains(output, "My Label") {
 		t.Errorf("Expected label text, got %s", output)
 	}
