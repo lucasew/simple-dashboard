@@ -76,6 +76,23 @@ func TestServeHTTP_UsesConfiguredReloadTimeout(t *testing.T) {
 	}
 }
 
+func TestServeHTTP_SetsHTMLContentType(t *testing.T) {
+	t.Parallel()
+
+	h := NewGoDashboardFromBlocks()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, req)
+
+	ct := rec.Header().Get("Content-Type")
+	if !strings.HasPrefix(ct, "text/html") {
+		t.Fatalf("Content-Type = %q, want text/html", ct)
+	}
+	if !strings.Contains(ct, "charset=utf-8") {
+		t.Fatalf("Content-Type = %q, want charset=utf-8", ct)
+	}
+}
+
 func TestNewGoDashboardFromBlocks_DefaultReloadTimeout(t *testing.T) {
 	t.Parallel()
 

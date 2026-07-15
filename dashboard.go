@@ -113,6 +113,9 @@ func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
 	reqContext := NewRequestContext(r.Context())
 
+	// Before first write so clients get an explicit type (no MIME sniffing).
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	_, err = fmt.Fprint(w, htmlBefore)
 	if err != nil {
 		goto handle_err
