@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/lucasew/gocfg"
 )
+
+// defaultReloadTimeoutMs is used when reload_timeout is missing or invalid.
+const defaultReloadTimeoutMs = 1000
 
 var PORT int
 
@@ -59,7 +63,8 @@ const htmlAfter = `
 `
 
 type GoDashboard struct {
-	blocks []RenderableBlock
+	blocks          []RenderableBlock
+	reloadTimeoutMs int
 }
 
 func NewGoDashboard(cfg gocfg.Config) http.Handler {
@@ -75,11 +80,31 @@ func NewGoDashboard(cfg gocfg.Config) http.Handler {
 		blocks = append(blocks, block)
 		log.Printf("setting up section %s\n", k)
 	}
-	return NewGoDashboardFromBlocks(blocks...)
+	d := &GoDashboard{
+		blocks:          blocks,
+		reloadTimeoutMs: parseReloadTimeoutMs(cfg),
+	}
+	return d
+}
+
+func parseReloadTimeoutMs(cfg gocfg.Config) int {
+	if !cfg.RawHasKey("", "reload_timeout") {
+		return defaultReloadTimeoutMs
+	}
+	raw := cfg.RawGet("", "reload_timeout")
+	ms, err := strconv.Atoi(raw)
+	if err != nil || ms <= 0 {
+		log.Printf("invalid reload_timeout %q, using default %dms", raw, defaultReloadTimeoutMs)
+		return defaultReloadTimeoutMs
+	}
+	return ms
 }
 
 func NewGoDashboardFromBlocks(blocks ...RenderableBlock) http.Handler {
-	return &GoDashboard{blocks}
+	return &GoDashboard{
+		blocks:          blocks,
+		reloadTimeoutMs: defaultReloadTimeoutMs,
+	}
 }
 
 func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +128,7 @@ func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		goto handle_err
 	}
-	_, err = fmt.Fprintln(w, "<script>setTimeout(() => window.location.reload(true), 1000)</script>")
+	_, err = fmt.Fprintf(w, "<script>setTimeout(() => window.location.reload(true), %d)</script>\n", g.reloadTimeoutMs)
 	if err != nil {
 		goto handle_err
 	}
