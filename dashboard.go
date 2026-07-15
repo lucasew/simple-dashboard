@@ -1,6 +1,7 @@
 package godashboard
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -135,5 +136,15 @@ func (g *GoDashboard) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 handle_err:
 	// If we can't write to w, there's not much we can do.
-	_, _ = fmt.Fprintf(w, "<script>alert(`%s`)</script>", err.Error())
+	// JSON-encode so quotes, backticks, and </script> cannot break out of the alert.
+	writeClientErrorAlert(w, err)
+}
+
+// writeClientErrorAlert emits a script that alerts a safely encoded error message.
+func writeClientErrorAlert(w http.ResponseWriter, err error) {
+	msg, marshalErr := json.Marshal(err.Error())
+	if marshalErr != nil {
+		msg = []byte(`"dashboard render error"`)
+	}
+	_, _ = fmt.Fprintf(w, "<script>alert(%s)</script>", msg)
 }
