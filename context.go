@@ -2,6 +2,7 @@ package godashboard
 
 import (
 	"context"
+	"errors"
 	"os"
 	"time"
 
@@ -86,8 +87,18 @@ func (r *RequestContext) CPUUsagePerCPU() ([]float64, error) {
 
 func (r *RequestContext) CPUUsage() (float64, error) {
 	vals, err := cpu.PercentWithContext(r.context, 0, false)
+	return firstCPUPercent(vals, err)
+}
+
+// firstCPUPercent returns the aggregate CPU percent sample.
+// gopsutil can return a nil/empty slice without an error on some platforms
+// or when samples are unavailable; indexing [0] would panic.
+func firstCPUPercent(vals []float64, err error) (float64, error) {
 	if err != nil {
 		return 0, err
+	}
+	if len(vals) == 0 {
+		return 0, errors.New("cpu usage: empty percent sample")
 	}
 	return vals[0], nil
 }
