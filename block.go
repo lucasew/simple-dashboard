@@ -62,12 +62,18 @@ func parseDimensions(section gocfg.SectionProvider) (int, int, error) {
 		if err != nil {
 			return 0, 0, fmt.Errorf("while getting size_x: %w", err)
 		}
+		if r <= 0 {
+			return 0, 0, fmt.Errorf("size_x must be positive, got %d", r)
+		}
 		sx = r
 	}
 	if section.RawHasKey("size_y") {
 		r, err := strconv.Atoi(section.RawGet("size_y"))
 		if err != nil {
 			return 0, 0, fmt.Errorf("while getting size_y: %w", err)
+		}
+		if r <= 0 {
+			return 0, 0, fmt.Errorf("size_y must be positive, got %d", r)
 		}
 		sy = r
 	}

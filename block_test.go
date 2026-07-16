@@ -112,3 +112,56 @@ func TestSectionAsRenderBlock_Errors(t *testing.T) {
 		t.Error("Expected error for invalid size_x")
 	}
 }
+
+func TestSectionAsRenderBlock_NonPositiveSizes(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		keys map[string]string
+		want string
+	}{
+		{
+			name: "zero size_x",
+			keys: map[string]string{
+				"label":            "L",
+				"background_color": "red",
+				"size_x":           "0",
+			},
+			want: "size_x must be positive",
+		},
+		{
+			name: "negative size_y",
+			keys: map[string]string{
+				"label":            "L",
+				"background_color": "red",
+				"size_y":           "-2",
+			},
+			want: "size_y must be positive",
+		},
+		{
+			name: "zero size_x on background image",
+			keys: map[string]string{
+				"background_image": "http://example.com/i.png",
+				"size_x":           "0",
+				"size_y":           "1",
+			},
+			want: "size_x must be positive",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			section := MockSectionProvider(tt.keys)
+			_, err := SectionAsRenderBlock(section)
+			if err == nil {
+				t.Fatal("expected error for non-positive size")
+			}
+			if !strings.Contains(err.Error(), tt.want) {
+				t.Fatalf("error %q does not contain %q", err.Error(), tt.want)
+			}
+		})
+	}
+}
