@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/lucasew/gocfg"
@@ -12,8 +13,6 @@ import (
 
 // defaultReloadTimeoutMs is used when reload_timeout is missing or invalid.
 const defaultReloadTimeoutMs = 1000
-
-var PORT int
 
 const htmlBefore = `
 <html>
@@ -69,12 +68,20 @@ type GoDashboard struct {
 }
 
 func NewGoDashboard(cfg gocfg.Config) http.Handler {
-	blocks := []RenderableBlock{}
-	for k, v := range cfg {
+	// gocfg.Config is a map; range order is random. Sort section names so the
+	// rendered block layout is stable across process restarts.
+	names := make([]string, 0, len(cfg))
+	for k := range cfg {
 		if k == "" {
-			continue
+			continue // global section (e.g. reload_timeout), not a block
 		}
-		block, err := SectionAsRenderBlock(v)
+		names = append(names, k)
+	}
+	sort.Strings(names)
+
+	blocks := make([]RenderableBlock, 0, len(names))
+	for _, k := range names {
+		block, err := SectionAsRenderBlock(cfg[k])
 		if err != nil {
 			panic(fmt.Errorf("while loading section '%s': %w", k, err))
 		}
