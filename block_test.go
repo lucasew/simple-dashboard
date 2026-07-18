@@ -3,8 +3,13 @@ package godashboard
 import (
 	"bytes"
 	"context"
+	"html/template"
+	"io"
+	"os"
 	"strings"
 	"testing"
+
+	"github.com/lucasew/gocfg"
 )
 
 // MockSectionProvider implements gocfg.SectionProvider interface based on usage in block.go
@@ -163,5 +168,73 @@ func TestSectionAsRenderBlock_NonPositiveSizes(t *testing.T) {
 				t.Fatalf("error %q does not contain %q", err.Error(), tt.want)
 			}
 		})
+	}
+}
+
+// exampleTempData matches the fields used by config.ini.example [temp] labels.
+type exampleTempData struct {
+	Temperatures []struct {
+		Temperature float64
+	}
+}
+
+func TestConfigExample_TempLabelHandlesEmptySensors(t *testing.T) {
+	t.Parallel()
+
+	f, err := os.Open("config.ini.example")
+	if err != nil {
+		t.Fatalf("open config.ini.example: %v", err)
+	}
+	t.Cleanup(func() {
+		if cerr := f.Close(); cerr != nil {
+			t.Errorf("close config.ini.example: %v", cerr)
+		}
+	})
+
+	cfg := gocfg.NewConfig()
+	if err := cfg.InjestReader(f); err != nil {
+		t.Fatalf("parse config.ini.example: %v", err)
+	}
+	label := cfg.RawGet("temp", "label")
+	if label == "" {
+		t.Fatal("temp.label missing from config.ini.example")
+	}
+
+	tpl, err := template.New("temp").Parse(label)
+	if err != nil {
+		t.Fatalf("parse temp label template: %v", err)
+	}
+
+	// Empty sensor list (VMs, containers, hosts without hwmon): must not error.
+	var buf bytes.Buffer
+	if err := tpl.Execute(&buf, exampleTempData{}); err != nil {
+		t.Fatalf("temp label with empty sensors: %v (label=%q)", err, label)
+	}
+	if got := buf.String(); got != "n/a" {
+		t.Fatalf("temp label empty sensors = %q, want n/a", got)
+	}
+
+	// One sensor still formats the reading.
+	buf.Reset()
+	data := exampleTempData{Temperatures: []struct{ Temperature float64 }{{Temperature: 42.5}}}
+	if err := tpl.Execute(&buf, data); err != nil {
+		t.Fatalf("temp label with sensor: %v", err)
+	}
+	if got := buf.String(); got != "42.5 °C" {
+		t.Fatalf("temp label with sensor = %q, want %q", got, "42.5 °C")
+	}
+}
+
+func TestIndexTemperaturesZero_EmptySliceErrors(t *testing.T) {
+	t.Parallel()
+
+	// Documents why config.ini.example must guard before index.
+	tpl, err := template.New("unsafe").Parse(`{{with index .Temperatures 0}}{{.Temperature}}{{end}}`)
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	err = tpl.Execute(io.Discard, exampleTempData{})
+	if err == nil {
+		t.Fatal("expected index on empty Temperatures to error")
 	}
 }
