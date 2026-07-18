@@ -1,6 +1,6 @@
 # vim:ft=ini
 
-; timeout passed to the tail script
+; Browser auto-reload interval in milliseconds
 reload_timeout=1000
 
 [distroicon]
@@ -26,7 +26,8 @@ label={{with .DiskUsage "/"}}{{printf "%.2f" .UsedPercent}}{{end}}%
 [temp]
 background_color=blue
 ; size_x and size_y defaults to 1
-label={{ with index .Temperatures 0}} {{.Temperature}} °C{{ end }}
+; Guard empty sensor lists: bare `index .Temperatures 0` errors and aborts render.
+label={{if .Temperatures}}{{with index .Temperatures 0}}{{printf "%.1f" .Temperature}} °C{{end}}{{else}}n/a{{end}}
 
 [load]
 background_color=yellow
