@@ -51,7 +51,7 @@ func SectionAsRenderBlock(section gocfg.SectionProvider) (RenderableBlock, error
 		return createLabelBlock(section, sx, sy)
 	}
 
-	return nil, errors.New("unmatched block type")
+	return nil, errors.New("section must define background_image or label")
 }
 
 func parseDimensions(section gocfg.SectionProvider) (int, int, error) {
@@ -92,6 +92,11 @@ func createBackgroundImageBlock(section gocfg.SectionProvider, sx, sy int) (Rend
 }
 
 func createLabelBlock(section gocfg.SectionProvider, sx, sy int) (RenderableBlock, error) {
+	// Label tiles always paint a filled rect; missing color yields style="fill:;" and an
+	// invisible/broken block. Require the key at load time so config errors surface early.
+	if !section.RawHasKey("background_color") {
+		return nil, errors.New("label blocks require background_color")
+	}
 	tpl_label, err := template.New("label").Parse(section.RawGet("label"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid label template: %w", err)
