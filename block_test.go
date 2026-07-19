@@ -116,6 +116,30 @@ func TestSectionAsRenderBlock_Errors(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error for invalid size_x")
 	}
+
+	// Label without background_color
+	section3 := MockSectionProvider{
+		"label": "L",
+	}
+	_, err = SectionAsRenderBlock(section3)
+	if err == nil {
+		t.Error("Expected error for label without background_color")
+	}
+	if !strings.Contains(err.Error(), "background_color") {
+		t.Errorf("error %q should mention background_color", err.Error())
+	}
+
+	// Neither background_image nor label
+	section4 := MockSectionProvider{
+		"size_x": "2",
+	}
+	_, err = SectionAsRenderBlock(section4)
+	if err == nil {
+		t.Error("Expected error for section without block type keys")
+	}
+	if !strings.Contains(err.Error(), "background_image or label") {
+		t.Errorf("error %q should explain required keys", err.Error())
+	}
 }
 
 func TestSectionAsRenderBlock_NonPositiveSizes(t *testing.T) {
