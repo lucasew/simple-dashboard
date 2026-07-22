@@ -4,9 +4,10 @@
 
 buildGoModule {
   pname = "simple-dashboard";
-  version = "unstable-2022-07-15";
+  # Keep in sync with make_release / version.txt (not a frozen unstable date).
+  version = lib.fileContents ./version.txt;
 
-  src =  ./.;
+  src = ./.;
   vendorHash = "sha256-a6iSGI+PJxIqF2WDp86SCR7Q2+pYf2kn0d7jKPScCyg=";
 
   postInstall = ''
