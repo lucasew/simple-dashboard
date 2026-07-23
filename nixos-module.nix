@@ -25,10 +25,17 @@ in {
   };
   config = with lib; mkIf cfg.enable {
     systemd.services.simple-dashboardd = {
-      enable = true;
+      description = "Simple system usage dashboard";
+      # Without wantedBy, enable=true only defines a unit that never joins the boot graph.
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
       script = ''
         ${lib.getExe cfg.package} -c ${builtins.toFile "simple-dashboard.cfg" cfg.config} -p ${builtins.toString cfg.port}
       '';
+      serviceConfig = {
+        Restart = "on-failure";
+        RestartSec = "5s";
+      };
       restartIfChanged = true;
     };
     networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.port ];
