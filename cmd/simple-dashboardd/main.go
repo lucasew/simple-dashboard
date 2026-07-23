@@ -2,12 +2,14 @@ package main
 
 import (
 	"flag"
-	"github.com/lucasew/go-getlistener"
-	"github.com/lucasew/gocfg"
-	"github.com/lucasew/godashboard"
 	"log"
 	"net/http"
 	"os"
+	"time"
+
+	"github.com/lucasew/go-getlistener"
+	"github.com/lucasew/gocfg"
+	"github.com/lucasew/godashboard"
 )
 
 const banner = `
@@ -44,9 +46,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = http.Serve(ln, dashboard)
+	// ReadHeaderTimeout mitigates Slowloris-style holds when the port is exposed
+	// (e.g. openFirewall / non-loopback HOST).
+	srv := &http.Server{
+		Handler:           dashboard,
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+	err = srv.Serve(ln)
 	if err != nil {
 		panic(err)
 	}
-
 }
