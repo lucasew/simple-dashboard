@@ -8,7 +8,7 @@ buildGoModule {
   version = lib.fileContents ./version.txt;
 
   src = ./.;
-  vendorHash = "sha256-a6iSGI+PJxIqF2WDp86SCR7Q2+pYf2kn0d7jKPScCyg=";
+  vendorHash = "sha256-HyrTCvytYTaOO+fkbQV0CzPUqLoB1JyXz2+duPyY3wE=";
 
   postInstall = ''
       mkdir $out/share/simple-dashboard -p
