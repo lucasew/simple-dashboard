@@ -129,6 +129,31 @@ func TestSectionAsRenderBlock_Errors(t *testing.T) {
 		t.Errorf("error %q should mention background_color", err.Error())
 	}
 
+	// Label with blank background_color (key present, empty value) → same broken fill:;
+	section3b := MockSectionProvider{
+		"label":            "L",
+		"background_color": "   ",
+	}
+	_, err = SectionAsRenderBlock(section3b)
+	if err == nil {
+		t.Error("Expected error for blank background_color")
+	}
+	if !strings.Contains(err.Error(), "background_color") {
+		t.Errorf("error %q should mention background_color", err.Error())
+	}
+
+	// background_image key present but empty
+	section3c := MockSectionProvider{
+		"background_image": "  ",
+	}
+	_, err = SectionAsRenderBlock(section3c)
+	if err == nil {
+		t.Error("Expected error for empty background_image")
+	}
+	if !strings.Contains(err.Error(), "background_image") {
+		t.Errorf("error %q should mention background_image", err.Error())
+	}
+
 	// Neither background_image nor label
 	section4 := MockSectionProvider{
 		"size_x": "2",

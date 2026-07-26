@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"strconv"
+	"strings"
 
 	"github.com/lucasew/gocfg"
 )
@@ -39,10 +40,10 @@ func SectionAsRenderBlock(section gocfg.SectionProvider) (RenderableBlock, error
 
 	if section.RawHasKey("background_image") {
 		if section.RawHasKey("background_color") {
-			return nil, fmt.Errorf("a section cant have both a background_image and a background_color")
+			return nil, fmt.Errorf("a section cannot have both a background_image and a background_color")
 		}
 		if section.RawHasKey("label") {
-			return nil, fmt.Errorf("a section cant have both a background_image and a label")
+			return nil, fmt.Errorf("a section cannot have both a background_image and a label")
 		}
 		return createBackgroundImageBlock(section, sx, sy)
 	}
@@ -81,7 +82,12 @@ func parseDimensions(section gocfg.SectionProvider) (int, int, error) {
 }
 
 func createBackgroundImageBlock(section gocfg.SectionProvider, sx, sy int) (RenderableBlock, error) {
-	tpl, err := template.New("background_image").Parse(section.RawGet("background_image"))
+	raw := strings.TrimSpace(section.RawGet("background_image"))
+	// Empty src produces a broken <img>; catch at load time like other config errors.
+	if raw == "" {
+		return nil, errors.New("background_image must not be empty")
+	}
+	tpl, err := template.New("background_image").Parse(raw)
 	if err != nil {
 		return nil, fmt.Errorf("invalid background_image template: %w", err)
 	}
@@ -92,9 +98,9 @@ func createBackgroundImageBlock(section gocfg.SectionProvider, sx, sy int) (Rend
 }
 
 func createLabelBlock(section gocfg.SectionProvider, sx, sy int) (RenderableBlock, error) {
-	// Label tiles always paint a filled rect; missing color yields style="fill:;" and an
-	// invisible/broken block. Require the key at load time so config errors surface early.
-	if !section.RawHasKey("background_color") {
+	// Label tiles always paint a filled rect; missing or blank color yields style="fill:;"
+	// and an invisible/broken block. Require a non-empty value at load time.
+	if !section.RawHasKey("background_color") || strings.TrimSpace(section.RawGet("background_color")) == "" {
 		return nil, errors.New("label blocks require background_color")
 	}
 	tpl_label, err := template.New("label").Parse(section.RawGet("label"))
